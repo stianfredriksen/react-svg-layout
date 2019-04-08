@@ -1,42 +1,93 @@
 import React, { Component } from "react";
-import sizeMe from "react-sizeme";
 import Svg from "./svg/Svg";
 import "./App.css";
 
-const Wrapper = sizeMe({
-  monitorHeight: true
-})(Svg);
-
-const response = {
-  square: {
-    x: 100,
-    y: 200,
-    radius: 25
+const response = [
+  {
+    id: 1,
+    color: "#0097e6",
+    info: {
+      x: 100,
+      y: 200
+    },
+    pointer: {
+      x: 310,
+      y: 290,
+      radius: 7
+    },
+    size: {
+      width: 1200,
+      height: 676.9
+    },
+    tag: {
+      name: "Fancy",
+      description: "Sjukt fancy",
+      unit: "%"
+    }
   },
-  circle: {
-    x: 300,
-    y: 270
-  },
-  size: {
-    width: 1200,
-    height: 676.9
+  {
+    id: 2,
+    color: "#512D6D",
+    info: {
+      x: 400,
+      y: 100
+    },
+    pointer: {
+      x: 470,
+      y: 270,
+      radius: 7
+    },
+    size: {
+      width: 1200,
+      height: 676.9
+    },
+    tag: {
+      name: "Something",
+      description: "Sjukt fancy",
+      unit: "%"
+    }
   }
-};
+];
 
 class App extends Component {
+  state = { boxes: response };
+
+  updatePointer = (id, x, y, height, width) => {
+    const b = this.state.boxes.find(v => v.id === id);
+
+    const test2 = width / b.size.width;
+    const newX = x / test2;
+    const test3 = height / b.size.height;
+    const newY = y / test3;
+
+    b.pointer.x = newX;
+    b.pointer.y = newY;
+    this.setState(prevState => ({ ...prevState.boxes, b }));
+  };
+
   render() {
-    const { square, circle, size } = response;
-    const box = {
-      dx: square.x / size.width,
-      dy: square.y / size.height,
-      dx2: circle.x / size.width,
-      dy2: circle.y / size.height,
-      elements: response
-    };
+    const boxes = this.state.boxes.map(box => {
+      const { info, pointer, size } = box;
+      const tempBox = {
+        ...box,
+        pointer: {
+          ...box.pointer,
+          dx: pointer.x / size.width,
+          dy: pointer.y / size.height
+        },
+        info: {
+          ...box.info,
+          dx: info.x / size.width,
+          dy: info.y / size.height
+        }
+      };
+
+      return tempBox;
+    });
 
     return (
       <div className="App">
-        <Wrapper box={box} />
+        <Svg boxes={boxes} updatePointer={this.updatePointer} />
       </div>
     );
   }
